@@ -9,12 +9,16 @@ let num8 = document.getElementById("btn8");
 let num9 = document.getElementById("btn9");
 let num0 = document.getElementById("btn0");
 let add = document.getElementById("btnAdd");
+let decimal = document.getElementById("btnDecimal");
 let subtract = document.getElementById("btnSubtract");
 let multiply = document.getElementById("btnMultiply");
 let divide = document.getElementById("btnDivide");
 let equal = document.getElementById("btnEqual");
 let clear = document.getElementById("btnClear");
 let display = document.getElementById("display");
+let backspace = document.getElementById("btnBackspace");
+let formulas = document.getElementById("formulas");
+let historyDisplay = document.getElementById("historyDisplay");
 
 function appendToDisplay(value) {
     const p = document.createElement("p");
@@ -22,6 +26,8 @@ function appendToDisplay(value) {
     display.appendChild(p);
 }
 
+
+let history = [];
 let numValues = [];
 console.log(numValues);
 
@@ -77,10 +83,15 @@ multiply.addEventListener("click", function() {
     appendToDisplay("*");
     numValues.push("*");
 });
+decimal.addEventListener("click", function() {
+    appendToDisplay(".");
+    numValues.push(".");
+});
 divide.addEventListener("click", function() {
     appendToDisplay("/");
     numValues.push("/");
     console.log(numValues);
+    
 });
 
 
@@ -93,6 +104,7 @@ equal.addEventListener("click", function() {
                     numValues[i] = numValues[i]+numValues[j];
                     numValues.splice(j, 1);
                     console.log(numValues);
+                    numValues[i] = String(numValues[i]);
                     j--;
 
                 } else {
@@ -101,11 +113,7 @@ equal.addEventListener("click", function() {
             }
     console.log(numValues);
         } else if (numValues[i] === "+") {
-            if (!isNaN(numValues[i-1]) && !isNaN(numValues[i+1])) {
-                numValues[i-1] = Number(numValues[i-1]);
-                numValues[i+1] = Number(numValues[i+1]);
-                console.log(numValues[i-1] + numValues[i+1]);
-            }
+            console.log("This is an addition operator: " + numValues[i]);
         } else if (numValues[i] === "-") {
             console.log("This is a subtraction operator: " + numValues[i]);
         } else if (numValues[i] === "*") {
@@ -114,6 +122,59 @@ equal.addEventListener("click", function() {
             console.log("This is a division operator: " + numValues[i]);
         }
     }
+    let expression = numValues.join("");
+    numValues = [expression];
+    console.log(numValues);
+
+    let answer = eval(expression);
+    display.textContent = answer;
+    numValues = [];
+    expression = "";
+    history.push(answer);
+    console.log(history);
+    try {
+        if (btnHistory !== null && btnHistory.length === 0) {
+            console.log("History button already exists");
+        } 
+    } catch {
+        console.log("History button does not exist, creating it now");
+        displayHistoryButton();
+    }
 });
 
 
+function displayHistoryButton() {
+    console.log(history.length);
+    if (history.length > 0) {
+        let btnHistory = document.createElement("button");
+        btnHistory.id = "btnHistory";
+        btnHistory.textContent = "History";
+        document.body.appendChild(btnHistory);
+
+        btnHistory.addEventListener("click", function() {
+        historyDisplay.textContent = "";
+        for (let i = 0; i < history.length; i++) {
+            const btnHistoryItem = document.createElement("button");
+            btnHistoryItem.textContent = history[i];
+        historyDisplay.appendChild(btnHistoryItem);
+        }
+    });
+
+    } else {
+        console.log("No history to display");
+    };
+}
+
+
+
+clear.addEventListener("click", function() {
+    display.textContent = "";
+    numValues = [];
+    console.log(numValues);
+});
+
+backspace.addEventListener("click", function() {
+    display.textContent = display.textContent.slice(0, -1);
+    numValues.pop();
+    console.log(numValues);
+});
