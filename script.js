@@ -156,7 +156,7 @@ function displayHistoryButton() {
         for (let i = 0; i < history.length; i++) {
             const btnHistoryItem = document.createElement("button");
             btnHistoryItem.textContent = history[i];
-        historyDisplay.appendChild(btnHistoryItem);
+            historyDisplay.appendChild(btnHistoryItem);
         }
     });
 
