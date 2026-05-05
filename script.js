@@ -129,6 +129,7 @@ equal.addEventListener("click", function() {
     let answer = eval(expression);
     display.textContent = answer;
     numValues = [];
+    numValues.push(answer);
     expression = "";
     history.push(answer);
     console.log(history);
@@ -156,10 +157,18 @@ function displayHistoryButton() {
         for (let i = 0; i < history.length; i++) {
             const btnHistoryItem = document.createElement("button");
             btnHistoryItem.textContent = history[i];
+            btnHistoryItem.id = "btnHistoryItem" + [i];
             historyDisplay.appendChild(btnHistoryItem);
+            localStorage.setItem(history[i], history[i]);
+            let storedHistory = localStorage.getItem(history[i]);
+            console.log(storedHistory);
+            btnHistoryItem.addEventListener("click", function() {
+                console.log("History item " + i + " clicked: " + history[i]);
+                numValues.push(history[i]);
+                display.textContent = history[i];
+            });
         }
-    });
-
+        });
     } else {
         console.log("No history to display");
     };
@@ -178,3 +187,63 @@ backspace.addEventListener("click", function() {
     numValues.pop();
     console.log(numValues);
 });
+
+formulas.addEventListener("click", function() {
+    const rectangleFormulaBtn = document.createElement("button");
+    rectangleFormulaBtn.textContent = "rectangleFormula";
+    document.body.appendChild(rectangleFormulaBtn);
+    rectangleFormulaBtn.addEventListener("click", function() {
+        let lengthInput = document.createElement("input");
+        lengthInput.type = "number";
+        lengthInput.placeholder = "Length";
+        let widthInput = document.createElement("input");
+        widthInput.type = "number";
+        widthInput.placeholder = "Width";
+        let submitBtn = document.createElement("button");
+        submitBtn.textContent = "Submit";
+        document.body.appendChild(lengthInput);
+        document.body.appendChild(widthInput);
+        document.body.appendChild(submitBtn);
+        // let rectangle = new rectangleFormula(lengthInput.value, widthInput.value);
+        // submitBtn.addEventListener("click", function() {
+        //     display.textContent = rectangle.calculate();
+        // });
+        let newTest = new test();
+        console.log(newTest.test);
+        submitBtn.addEventListener("click", function() {
+            let newRectangle = new rectangleFormula(lengthInput.value, widthInput.value);
+            newRectangle.calculate();
+    });
+})
+});
+
+const test = class {
+    constructor() {
+        this.test = "This is a test";
+        function testFunction() {
+            console.log("This is a test function");
+        }
+    }
+};
+
+const rectangleFormula = class {
+    constructor(length, width) {
+        this.length = length;
+        this.width = width;
+        this.calculate = function() {
+
+            let area = length * width;
+            display.textContent = area;
+        }
+    }
+}
+
+class rectanglePrismFormula extends rectangleFormula {
+    constructor(length, width, height) {
+        super(length, width);
+        this.height = height;
+        function volume() {
+            return length * width * height;
+        }
+    }
+}
