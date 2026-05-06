@@ -19,6 +19,7 @@ let display = document.getElementById("display");
 let backspace = document.getElementById("btnBackspace");
 let formulas = document.getElementById("formulas");
 let historyDisplay = document.getElementById("historyDisplay");
+let clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
 function appendToDisplay(value) {
     const p = document.createElement("p");
@@ -26,10 +27,29 @@ function appendToDisplay(value) {
     display.appendChild(p);
 }
 
+function saveHistory(historyArray) {
+    window.localStorage.setItem("calcHistory", JSON.stringify(historyArray));
+}
 
-let history = [];
+function loadHistory() {
+    const stored = window.localStorage.getItem("calcHistory");
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    return [];
+}
+
+function clearHistory() {
+    window.localStorage.removeItem("calcHistory");
+}
+
+let history = loadHistory();
 let numValues = [];
 console.log(numValues);
+
+clearHistoryBtn.addEventListener("click", function() {
+    clearHistory()
+})
 
 num1.addEventListener("click", function() {
     appendToDisplay("1");
@@ -132,6 +152,7 @@ equal.addEventListener("click", function() {
     numValues.push(answer);
     expression = "";
     history.push(answer);
+    saveHistory(history); 
     console.log(history);
     try {
         if (btnHistory !== null && btnHistory.length === 0) {
@@ -159,9 +180,6 @@ function displayHistoryButton() {
             btnHistoryItem.textContent = history[i];
             btnHistoryItem.id = "btnHistoryItem" + [i];
             historyDisplay.appendChild(btnHistoryItem);
-            localStorage.setItem(history[i], history[i]);
-            let storedHistory = localStorage.getItem(history[i]);
-            console.log(storedHistory);
             btnHistoryItem.addEventListener("click", function() {
                 console.log("History item " + i + " clicked: " + history[i]);
                 numValues.push(history[i]);
@@ -192,6 +210,9 @@ formulas.addEventListener("click", function() {
     const rectangleFormulaBtn = document.createElement("button");
     rectangleFormulaBtn.textContent = "rectangleFormula";
     document.body.appendChild(rectangleFormulaBtn);
+    const rectanglePrismFormulaBtn = document.createElement("button");
+    rectanglePrismFormulaBtn.textContent = "Rectangle Prism Formula";
+    document.body.appendChild(rectanglePrismFormulaBtn);
     rectangleFormulaBtn.addEventListener("click", function() {
         let lengthInput = document.createElement("input");
         lengthInput.type = "number";
@@ -204,17 +225,17 @@ formulas.addEventListener("click", function() {
         document.body.appendChild(lengthInput);
         document.body.appendChild(widthInput);
         document.body.appendChild(submitBtn);
-        // let rectangle = new rectangleFormula(lengthInput.value, widthInput.value);
-        // submitBtn.addEventListener("click", function() {
-        //     display.textContent = rectangle.calculate();
-        // });
-        let newTest = new test();
-        console.log(newTest.test);
         submitBtn.addEventListener("click", function() {
             let newRectangle = new rectangleFormula(lengthInput.value, widthInput.value);
             newRectangle.calculate();
+    
+    rectanglePrismFormulaBtn.addEventListener("click", function(){ 
+        console.log("button clicked")
     });
-})
+    })
+
+
+    })
 });
 
 const test = class {
