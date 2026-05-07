@@ -21,16 +21,22 @@ let formulas = document.getElementById("formulas");
 let historyDisplay = document.getElementById("historyDisplay");
 let clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
+
+
+// Function called to display numbers used in calculation
 function appendToDisplay(value) {
     const p = document.createElement("p");
     p.textContent += value;
     display.appendChild(p);
 }
 
+// ------------------------------ Local storage  ------------------------------
+// Function used to save history to local storage
 function saveHistory(historyArray) {
     window.localStorage.setItem("calcHistory", JSON.stringify(historyArray));
 }
 
+// Function to get items from local storage
 function loadHistory() {
     const stored = window.localStorage.getItem("calcHistory");
     if (stored) {
@@ -39,14 +45,17 @@ function loadHistory() {
     return [];
 }
 
+// Function to clear local storage
 function clearHistory() {
     window.localStorage.removeItem("calcHistory");
 }
+// ------------------------------ Local storage  ------------------------------
 
+// Starting arrays and history
 let history = loadHistory();
 let numValues = [];
-console.log(numValues);
 
+// ------------------------------ Button functions that append corresponding values to arrays  ------------------------------
 clearHistoryBtn.addEventListener("click", function() {
     clearHistory()
 })
@@ -113,8 +122,25 @@ divide.addEventListener("click", function() {
     console.log(numValues);
     
 });
+// ------------------------------ Button functions that append corresponding values to arrays  ------------------------------
 
+// ------------------------------ Buttons to remove values/operators from work screen ------------------------------
+// Clear work panel and num values array
+clear.addEventListener("click", function() {
+    display.textContent = "";
+    numValues = [];
+    console.log(numValues);
+});
 
+// Clears only the last value/operator inputted
+backspace.addEventListener("click", function() {
+    display.textContent = display.textContent.slice(0, -1);
+    numValues.pop();
+    console.log(numValues);
+});
+// ------------------------------ Buttons to remove values/operators from work screen ------------------------------
+
+// Equal sign button begins calculation
 equal.addEventListener("click", function() {
     for (let i = 0; i < numValues.length; i++) {
         if (!isNaN(numValues[i]) === true) {
@@ -140,13 +166,14 @@ equal.addEventListener("click", function() {
             console.log("This is a multiplication operator: " + numValues[i]);
         } else if (numValues[i] === "/") {
             console.log("This is a division operator: " + numValues[i]);
-        }
+        } // Console logs to track if program recongnises operators (code works without them but tends to be useful for debugging)
     }
     let expression = numValues.join("");
     numValues = [expression];
     console.log(numValues);
+    // Merges all of the values to allow for eval function 
 
-    let answer = eval(expression);
+    let answer = eval(expression); // Calculation and push to different arrays for storage
     display.textContent = answer;
     numValues = [];
     numValues.push(answer);
@@ -154,7 +181,7 @@ equal.addEventListener("click", function() {
     history.push(answer);
     saveHistory(history); 
     console.log(history);
-    try {
+    try { // History button is created when history button doesnt exist
         if (btnHistory !== null && btnHistory.length === 0) {
             console.log("History button already exists");
         } 
@@ -164,7 +191,7 @@ equal.addEventListener("click", function() {
     }
 });
 
-
+// Displaying history button when there are things in history and history logic
 function displayHistoryButton() {
     console.log(history.length);
     if (history.length > 0) {
@@ -188,83 +215,259 @@ function displayHistoryButton() {
         }
         });
     } else {
-        console.log("No history to display");
+        
     };
 }
 
 
 
-clear.addEventListener("click", function() {
-    display.textContent = "";
-    numValues = [];
-    console.log(numValues);
-});
 
-backspace.addEventListener("click", function() {
-    display.textContent = display.textContent.slice(0, -1);
-    numValues.pop();
-    console.log(numValues);
-});
+// ------------------------------ Shape formula classes and subclasses ------------------------------
 
+// Main class that is used as framework for shapes calculations
+class ShapeFormula {
+    constructor(name) {
+        this.name = name;
+        this.calculate = function(inputs) {
+            console.log("calculate() not implemented for " + name);
+        }
+    }
+}
+ 
+// Cone volume formula subclass
+class ConeVolume extends ShapeFormula {
+    constructor() {
+        super("Cone Volume");
+        this.radiusInput = document.createElement("input");
+        this.radiusInput.type = "number";
+        this.radiusInput.placeholder = "Radius";
+        this.heightInput = document.createElement("input");
+        this.heightInput.type = "number";
+        this.heightInput.placeholder = "Height";
+        this.calculate = function() {
+            let r = parseFloat(this.radiusInput.value);
+            let h = parseFloat(this.heightInput.value);
+            let result = (1 / 3) * Math.PI * r * r * h;
+            return result;
+        }
+    }
+}
+ 
+// Sphere volume formula subclass
+class SphereVolume extends ShapeFormula {
+    constructor() {
+        super("Sphere Volume");
+        this.radiusInput = document.createElement("input");
+        this.radiusInput.type = "number";
+        this.radiusInput.placeholder = "Radius";
+        this.calculate = function() {
+            let r = parseFloat(this.radiusInput.value);
+            let result = (4 / 3) * Math.PI * r * r * r;
+            return result;
+        }
+    }
+}
+
+// Cone surface area formula subclass
+class ConeSurfaceArea extends ShapeFormula {
+    constructor() {
+        super("Cone Surface Area");
+        this.radiusInput = document.createElement("input");
+        this.radiusInput.type = "number";
+        this.radiusInput.placeholder = "Radius";
+        this.heightInput = document.createElement("input");
+        this.heightInput.type = "number";
+        this.heightInput.placeholder = "Height";
+        this.calculate = function() {
+            let r = parseFloat(this.radiusInput.value);
+            let h = parseFloat(this.heightInput.value);
+            let slantHeight = Math.sqrt(r * r + h * h);
+            let result = Math.PI * r * r + Math.PI * r * slantHeight;
+            return result;
+        }
+    }
+}
+ 
+// Cone surface area formula subclass
+class SphereSurfaceArea extends ShapeFormula {
+    constructor() {
+        super("Sphere Surface Area");
+        this.radiusInput = document.createElement("input");
+        this.radiusInput.type = "number";
+        this.radiusInput.placeholder = "Radius";
+        this.calculate = function() {
+            let r = parseFloat(this.radiusInput.value);
+            let result = 4 * Math.PI * r * r;
+            return result;
+        }
+    }
+}
+ 
+
+// Creating of each 
+let coneVolume = new ConeVolume();
+let sphereVolume = new SphereVolume();
+let coneSurfaceArea = new ConeSurfaceArea();
+let sphereSurfaceArea = new SphereSurfaceArea();
+ 
+let formulaInputArea = null;
+// ------------------------------ Shape formula classes and subclasses ------------------------------
+
+// ------------------------------ Shape formula functions ------------------------------
+// Creation of buttons for the formulas 
 formulas.addEventListener("click", function() {
-    const rectangleFormulaBtn = document.createElement("button");
-    rectangleFormulaBtn.textContent = "rectangleFormula";
-    document.body.appendChild(rectangleFormulaBtn);
-    const rectanglePrismFormulaBtn = document.createElement("button");
-    rectanglePrismFormulaBtn.textContent = "Rectangle Prism Formula";
-    document.body.appendChild(rectanglePrismFormulaBtn);
-    rectangleFormulaBtn.addEventListener("click", function() {
-        let lengthInput = document.createElement("input");
-        lengthInput.type = "number";
-        lengthInput.placeholder = "Length";
-        let widthInput = document.createElement("input");
-        widthInput.type = "number";
-        widthInput.placeholder = "Width";
+    let coneVolumeBtn = document.createElement("button");
+    coneVolumeBtn.textContent = "Cone Volume";
+    document.body.appendChild(coneVolumeBtn);
+ 
+    let sphereVolumeBtn = document.createElement("button");
+    sphereVolumeBtn.textContent = "Sphere Volume";
+    document.body.appendChild(sphereVolumeBtn);
+ 
+    let coneSurfaceAreaBtn = document.createElement("button");
+    coneSurfaceAreaBtn.textContent = "Cone Surface Area";
+    document.body.appendChild(coneSurfaceAreaBtn);
+ 
+    let sphereSurfaceAreaBtn = document.createElement("button");
+    sphereSurfaceAreaBtn.textContent = "Sphere Surface Area";
+    document.body.appendChild(sphereSurfaceAreaBtn);
+ 
+    if (formulaInputArea === null) {
+        formulaInputArea = document.createElement("div");
+        formulaInputArea.id = "formulaInputArea";
+        document.body.appendChild(formulaInputArea);
+    }
+    
+    // Cone volume calculation
+    coneVolumeBtn.addEventListener("click", function() {
+        formulaInputArea.innerHTML = "";
+        let title = document.createElement("p");
+        title.textContent = coneVolume.name;
+        formulaInputArea.appendChild(title);
+        formulaInputArea.appendChild(coneVolume.radiusInput);
+        formulaInputArea.appendChild(coneVolume.heightInput);
         let submitBtn = document.createElement("button");
         submitBtn.textContent = "Submit";
-        document.body.appendChild(lengthInput);
-        document.body.appendChild(widthInput);
-        document.body.appendChild(submitBtn);
+        formulaInputArea.appendChild(submitBtn);
         submitBtn.addEventListener("click", function() {
-            let newRectangle = new rectangleFormula(lengthInput.value, widthInput.value);
-            newRectangle.calculate();
-    
-    rectanglePrismFormulaBtn.addEventListener("click", function(){ 
-        console.log("button clicked")
+            let result = coneVolume.calculate();
+            result = Math.round(result * 10000) / 10000;
+            display.textContent = result;
+            numValues = [];
+            numValues.push(result);
+            history.push(result);
+            saveHistory(history); // Adding to history
+            try {
+                if (btnHistory !== null && btnHistory.length === 0) {
+                    console.log("History button already exists");
+                }
+            } catch {
+                console.log("History button does not exist, creating it now");
+                displayHistoryButton();
+            } // Making history button appear after calculation
+        });
     });
-    })
-
-
-    })
+    // Sphere volume calculation
+    sphereVolumeBtn.addEventListener("click", function() {
+        formulaInputArea.innerHTML = "";
+        let title = document.createElement("p");
+        title.textContent = sphereVolume.name;
+        formulaInputArea.appendChild(title);
+        formulaInputArea.appendChild(sphereVolume.radiusInput);
+        let submitBtn = document.createElement("button");
+        submitBtn.textContent = "Submit";
+        formulaInputArea.appendChild(submitBtn);
+        submitBtn.addEventListener("click", function() {
+            let result = sphereVolume.calculate();
+            result = Math.round(result * 10000) / 10000;
+            display.textContent = result;
+            numValues = [];
+            numValues.push(result);
+            history.push(result);
+            saveHistory(history);
+            console.log("Sphere Volume result: " + result);
+            console.log(history);
+            try {
+                if (btnHistory !== null && btnHistory.length === 0) {
+                    console.log("History button already exists");
+                }
+            } catch {
+                console.log("History button does not exist, creating it now");
+                displayHistoryButton();
+            } // Making history button appear after calculation
+        });
+    });
+    // Cone surface area calculation
+    coneSurfaceAreaBtn.addEventListener("click", function() {
+        formulaInputArea.innerHTML = "";
+        let title = document.createElement("p");
+        title.textContent = coneSurfaceArea.name;
+        formulaInputArea.appendChild(title);
+        formulaInputArea.appendChild(coneSurfaceArea.radiusInput);
+        formulaInputArea.appendChild(coneSurfaceArea.heightInput);
+        let submitBtn = document.createElement("button");
+        submitBtn.textContent = "Submit";
+        formulaInputArea.appendChild(submitBtn);
+        submitBtn.addEventListener("click", function() {
+            let result = coneSurfaceArea.calculate();
+            result = Math.round(result * 10000) / 10000;
+            display.textContent = result;
+            numValues = [];
+            numValues.push(result);
+            history.push(result);
+            saveHistory(history);
+            console.log("Cone Surface Area result: " + result);
+            console.log(history);
+            try {
+                if (btnHistory !== null && btnHistory.length === 0) {
+                    console.log("History button already exists");
+                }
+            } catch {
+                console.log("History button does not exist, creating it now");
+                displayHistoryButton();
+            } // Making history button appear after calculation
+        });
+    });
+    // Sphere surface area calculation
+    sphereSurfaceAreaBtn.addEventListener("click", function() {
+        formulaInputArea.innerHTML = "";
+        let title = document.createElement("p");
+        title.textContent = sphereSurfaceArea.name;
+        formulaInputArea.appendChild(title);
+        formulaInputArea.appendChild(sphereSurfaceArea.radiusInput);
+        let submitBtn = document.createElement("button");
+        submitBtn.textContent = "Submit";
+        formulaInputArea.appendChild(submitBtn);
+        submitBtn.addEventListener("click", function() {
+            let result = sphereSurfaceArea.calculate();
+            result = Math.round(result * 10000) / 10000;
+            display.textContent = result;
+            numValues = [];
+            numValues.push(result);
+            history.push(result);
+            saveHistory(history);
+            console.log("Sphere Surface Area result: " + result);
+            console.log(history);
+            try {
+                if (btnHistory !== null && btnHistory.length === 0) {
+                    console.log("History button already exists");
+                }
+            } catch {
+                console.log("History button does not exist, creating it now");
+                displayHistoryButton();
+            } // Making history button appear after calculation
+        });
+    });
 });
 
-const test = class {
-    constructor() {
-        this.test = "This is a test";
-        function testFunction() {
-            console.log("This is a test function");
-        }
-    }
-};
+// ------------------------------ Shape formula functions ------------------------------
 
-const rectangleFormula = class {
-    constructor(length, width) {
-        this.length = length;
-        this.width = width;
-        this.calculate = function() {
+// A new formula can be added by simple creating a new subclass, making a new button, and using the same functions as seen above with new variables.
+// This allows for new formulas and features to be added in the future.
 
-            let area = length * width;
-            display.textContent = area;
-        }
-    }
-}
+// Originally I had planned to make a math review game that the code for would be placed down here however I ran out of time.
 
-class rectanglePrismFormula extends rectangleFormula {
-    constructor(length, width, height) {
-        super(length, width);
-        this.height = height;
-        function volume() {
-            return length * width * height;
-        }
-    }
-}
+//       __    __
+//     o-''))_____\\
+//     "--__/ * * * )
+//     c_c__/-c____/
