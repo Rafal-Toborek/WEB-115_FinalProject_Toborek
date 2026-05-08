@@ -55,3 +55,5 @@ All history values would be stored in local storage so that if the user leaves a
 - HTML, CSS, Vanilla JavaScript
 - `localStorage` for tournament persistence
 - VS Code + GitHub
+
+Live Site: https://rafal-toborek.github.io/WEB-115_FinalProject_Toborek/
